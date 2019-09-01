@@ -70,7 +70,8 @@ func main() {
 		fmt.Println()
 	}
 
-	fmt.Printf("Results (%v%%): %v pass, %v fail \n", pass / len(files)*100, pass, fail)
+	math := 100 * pass / (pass+fail)
+	fmt.Printf("Results (%v%%): %v pass, %v fail \n", int(math), pass, fail)
 
 }
 
@@ -145,9 +146,9 @@ func extractEXIF(data []byte) ([]byte, error) {
 
 			}
 
-			filtered = data
-			//filtered = data[:startExifBytes]
-			//filtered = append(filtered, data[endExifBytes:]...)
+			//filtered = data
+			filtered = data[:startExifBytes]
+			filtered = append(filtered, data[endExifBytes:]...)
 
 			//fmt.Printf("********(size) %v %v  (%v)\n", len(data), len(filtered), len(data)-len(filtered))
 
