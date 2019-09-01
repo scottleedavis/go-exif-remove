@@ -20,6 +20,9 @@ const (
 	JpegMediaType  = "jpeg"
 	PngMediaType   = "png"
 	OtherMediaType = "other"
+	START_BYTES    = 4
+	END_BYTES      = 4
+	OFFSET_BYTES   = 4
 )
 
 type MediaContext struct {
@@ -127,20 +130,21 @@ func extractEXIF(data []byte) ([]byte, error) {
 		} else {
 			//fmt.Printf("****(exif) %x %s %x\n", sExif.Offset, sExif.MarkerName, len(sExif.Data))
 
+
 			bytesCount := 0
-			startExifBytes := 4
-			endExifBytes := 4
+			startExifBytes := START_BYTES
+			endExifBytes := END_BYTES
 			for _, s := range sl.Segments() {
 
 				if s.MarkerName == sExif.MarkerName {
-					if startExifBytes == 4 {
+					if startExifBytes == START_BYTES {
 						startExifBytes = bytesCount
-						endExifBytes = startExifBytes + len(s.Data)
+						endExifBytes = startExifBytes + len(s.Data) + OFFSET_BYTES
 					} else {
-						endExifBytes += len(s.Data)
+						endExifBytes += len(s.Data) + OFFSET_BYTES
 					}
 				}
-				bytesCount += len(s.Data)
+				bytesCount += len(s.Data) + OFFSET_BYTES
 
 				//fmt.Printf("%x %s %v (%x)\n", s.Offset, s.MarkerName, len(s.Data), s.Offset+len(s.Data))
 
