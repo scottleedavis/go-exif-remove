@@ -32,19 +32,6 @@ type MediaContext struct {
 	Media     interface{}
 }
 
-type IfdEntry struct {
-	IfdPath     string      `json:"ifd_path"`
-	FqIfdPath   string      `json:"fq_ifd_path"`
-	IfdIndex    int         `json:"ifd_index"`
-	TagId       uint16      `json:"tag_id"`
-	TagName     string      `json:"tag_name"`
-	TagTypeId   uint16      `json:"tag_type_id"`
-	TagTypeName string      `json:"tag_type_name"`
-	UnitCount   uint32      `json:"unit_count"`
-	Value       interface{} `json:"value"`
-	ValueString string      `json:"value_string"`
-}
-
 func main() {
 
 	if len(os.Args) == 1 {
@@ -65,7 +52,7 @@ func main() {
 			fmt.Println(file)
 			if _, err := handleFile(file); err != nil {
 				fail += 1
-				fmt.Printf(err.Error())
+				//fmt.Printf(err.Error())
 			} else {
 				pass += 1
 			}
@@ -131,7 +118,7 @@ func extractEXIF(data []byte) ([]byte, error) {
 		if _, sExif, err := sl.FindExif(); err != nil {
 			return nil, err
 		} else {
-			//fmt.Printf("****(exif) %x %s %x\n", sExif.Offset, sExif.MarkerName, len(sExif.Data))
+			//fmt.Printf("* (sExif) %x %s %x\n", sExif.Offset, sExif.MarkerName, len(sExif.Data))
 
 
 			bytesCount := 0
@@ -146,10 +133,12 @@ func extractEXIF(data []byte) ([]byte, error) {
 					} else {
 						endExifBytes += len(s.Data) + OFFSET_BYTES
 					}
+					fmt.Printf("* (sExif) %x %s %v (%x)\n", s.Offset, s.MarkerName, len(s.Data), s.Offset+len(s.Data))
+				} else {
+					fmt.Printf("* (s) %x %s %v (%x)\n", s.Offset, s.MarkerName, len(s.Data), s.Offset+len(s.Data))
 				}
 				bytesCount += len(s.Data) + OFFSET_BYTES
 
-				//fmt.Printf("%x %s %v (%x)\n", s.Offset, s.MarkerName, len(s.Data), s.Offset+len(s.Data))
 
 			}
 
@@ -157,11 +146,11 @@ func extractEXIF(data []byte) ([]byte, error) {
 			filtered = data[:startExifBytes]
 			filtered = append(filtered, data[endExifBytes:]...)
 
-			//fmt.Printf("********(size) %v %v  (%v)\n", len(data), len(filtered), len(data)-len(filtered))
+			fmt.Printf("* (size) %v %v  (%v)\n", len(data), len(filtered), len(data)-len(filtered))
 
 			_, _, err = image.Decode(bytes.NewReader(filtered))
 			if err != nil {
-				return nil, errors.New("EXIF removal corrupted " + err.Error() + "\n")
+				return nil, errors.New("EXIF removal corrupted " + err.Error())
 			}
 
 		}
