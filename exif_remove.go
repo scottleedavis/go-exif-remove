@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"encoding/hex"
 
 	"github.com/dsoprea/go-exif"
 	"github.com/dsoprea/go-jpeg-image-structure"
@@ -20,9 +21,9 @@ const (
 	JpegMediaType  = "jpeg"
 	PngMediaType   = "png"
 	OtherMediaType = "other"
-	START_BYTES    = 4
-	END_BYTES      = 4
-	OFFSET_BYTES   = 4
+	StartBytes    = 4
+	EndBytes      = 4
+	OffsetBytes   = 4
 )
 
 type MediaContext struct {
@@ -63,7 +64,13 @@ func main() {
 		fmt.Printf("Results (%v%%): %v pass, %v fail \n", int(math), pass, fail)
 	} else {
 		filepath := os.Args[1]
-		handleFile(filepath)
+		b, _ := ioutil.ReadFile(filepath)
+		os.Remove("dht.txt")
+		f, _ := os.Create("dht.txt")
+		output := hex.Dump(b)
+		f.WriteString(output)
+		f.Close()
+		//handleFile(filepath)
 	}
 
 }
@@ -122,23 +129,32 @@ func extractEXIF(data []byte) ([]byte, error) {
 
 
 			bytesCount := 0
-			startExifBytes := START_BYTES
-			endExifBytes := END_BYTES
+			startExifBytes := StartBytes
+			endExifBytes := EndBytes
 			for _, s := range sl.Segments() {
 
 				if s.MarkerName == sExif.MarkerName {
-					if startExifBytes == START_BYTES {
+					if startExifBytes == StartBytes {
 						startExifBytes = bytesCount
-						endExifBytes = startExifBytes + len(s.Data) + OFFSET_BYTES
+						endExifBytes = startExifBytes + len(s.Data) + OffsetBytes
 					} else {
-						endExifBytes += len(s.Data) + OFFSET_BYTES
+						endExifBytes += len(s.Data) + OffsetBytes
 					}
 					fmt.Printf("* (sExif) %x %s %v (%x)\n", s.Offset, s.MarkerName, len(s.Data), s.Offset+len(s.Data))
 				} else {
 					fmt.Printf("* (s) %x %s %v (%x)\n", s.Offset, s.MarkerName, len(s.Data), s.Offset+len(s.Data))
 				}
-				bytesCount += len(s.Data) + OFFSET_BYTES
 
+				//if s.MarkerName == "DHT" {
+				//	fmt.Printf("%v %v %v\n",bytesCount,len(s.Data), len(data))
+				//	output := hex.Dump(data[bytesCount:bytesCount + len(s.Data) + OFFSET_BYTES])
+				//	os.Remove("dht.txt")
+				//	f, _ := os.Create("dht.txt")
+				//	f.WriteString(output)
+				//	f.Close()
+				//}
+
+				bytesCount += len(s.Data) + OffsetBytes
 
 			}
 
