@@ -5,8 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"image"
+	"image/jpeg"
 	"io/ioutil"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/dsoprea/go-exif"
 	"github.com/dsoprea/go-jpeg-image-structure"
@@ -40,19 +43,55 @@ type IfdEntry struct {
 }
 
 func main() {
-	file := os.Args[1]
-	if data, err := ioutil.ReadFile(file); err != nil {
-		fmt.Printf(err.Error())
-		return
-	} else {
-		if filtered, err := extractEXIF(data); err != nil {
+	//filepath := os.Args[1]
+	//handleFile("img/28-hex_value.jpg")
+
+	var files []string
+	root := "img"
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if path != "img" {
+			files = append(files, path)
+		}
+		return nil
+	})
+	if err != nil {
+		panic(err)
+	}
+	pass := 0
+	fail := 0
+	for _, file := range files {
+		fmt.Println(file)
+		if _, err := handleFile(file); err != nil {
+			fail += 1
 			fmt.Printf(err.Error())
-			return
 		} else {
-			if err := ioutil.WriteFile("img_output/test.jpg", filtered, 0644); err != nil {
-				fmt.Printf(err.Error())
+			pass += 1
+		}
+		fmt.Println()
+	}
+
+	fmt.Printf("Results (%v%%): %v pass, %v fail \n", pass / len(files)*100, pass, fail)
+
+}
+
+func handleFile(filepath string) ([]byte, error) {
+	if data, err := ioutil.ReadFile(filepath); err != nil {
+		fmt.Printf(err.Error())
+		return nil, err
+	} else {
+		_, err = jpeg.Decode(bytes.NewReader(data))
+		if err != nil {
+			fmt.Printf("ERROR: original image is corrupt" + err.Error() + "\n")
+			return nil, err
+		}
+		filtered, err := extractEXIF(data)
+		if err != nil {
+			if !strings.EqualFold(err.Error(), "no exif data") {
+				fmt.Printf("* " + err.Error() + "\n")
+				return nil, errors.New(err.Error())
 			}
 		}
+		return filtered, nil
 	}
 }
 
@@ -85,7 +124,7 @@ func extractEXIF(data []byte) ([]byte, error) {
 		if _, sExif, err := sl.FindExif(); err != nil {
 			return nil, err
 		} else {
-			fmt.Printf("****(exif) %x %s %x\n", sExif.Offset, sExif.MarkerName, len(sExif.Data))
+			//fmt.Printf("****(exif) %x %s %x\n", sExif.Offset, sExif.MarkerName, len(sExif.Data))
 
 			bytesCount := 0
 			startExifBytes := 4
@@ -102,18 +141,19 @@ func extractEXIF(data []byte) ([]byte, error) {
 				}
 				bytesCount += len(s.Data)
 
-				fmt.Printf("%x %s %v (%x)\n", s.Offset, s.MarkerName, len(s.Data), s.Offset+len(s.Data))
+				//fmt.Printf("%x %s %v (%x)\n", s.Offset, s.MarkerName, len(s.Data), s.Offset+len(s.Data))
 
 			}
 
-			filtered = data[:startExifBytes]
-			filtered = append(filtered, data[endExifBytes:]...)
+			filtered = data
+			//filtered = data[:startExifBytes]
+			//filtered = append(filtered, data[endExifBytes:]...)
 
-			fmt.Printf("********(size) %v %v  (%v)\n", len(data), len(filtered), len(data)-len(filtered))
+			//fmt.Printf("********(size) %v %v  (%v)\n", len(data), len(filtered), len(data)-len(filtered))
 
 			_, _, err = image.Decode(bytes.NewReader(filtered))
 			if err != nil {
-				return nil, errors.New("EXIF extraction corrupted image " + err.Error() + "\n")
+				return nil, errors.New("EXIF removal corrupted " + err.Error() + "\n")
 			}
 
 		}
