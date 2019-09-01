@@ -46,35 +46,38 @@ type IfdEntry struct {
 }
 
 func main() {
-	//filepath := os.Args[1]
-	//handleFile("img/28-hex_value.jpg")
 
-	var files []string
-	root := "img"
-	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-		if path != "img" {
-			files = append(files, path)
+	if len(os.Args) == 1 {
+		var files []string
+		root := "img"
+		err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+			if path != "img" {
+				files = append(files, path)
+			}
+			return nil
+		})
+		if err != nil {
+			panic(err)
 		}
-		return nil
-	})
-	if err != nil {
-		panic(err)
-	}
-	pass := 0
-	fail := 0
-	for _, file := range files {
-		fmt.Println(file)
-		if _, err := handleFile(file); err != nil {
-			fail += 1
-			fmt.Printf(err.Error())
-		} else {
-			pass += 1
+		pass := 0
+		fail := 0
+		for _, file := range files {
+			fmt.Println(file)
+			if _, err := handleFile(file); err != nil {
+				fail += 1
+				fmt.Printf(err.Error())
+			} else {
+				pass += 1
+			}
+			fmt.Println()
 		}
-		fmt.Println()
-	}
 
-	math := 100 * pass / (pass+fail)
-	fmt.Printf("Results (%v%%): %v pass, %v fail \n", int(math), pass, fail)
+		math := 100 * pass / (pass+fail)
+		fmt.Printf("Results (%v%%): %v pass, %v fail \n", int(math), pass, fail)
+	} else {
+		filepath := os.Args[1]
+		handleFile(filepath)
+	}
 
 }
 
