@@ -3,8 +3,10 @@ package exifremove
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"image/jpeg"
 	"image/png"
+	"unsafe"
 
 	"github.com/dsoprea/go-exif"
 	"github.com/dsoprea/go-jpeg-image-structure"
@@ -105,6 +107,21 @@ func RemoveEXIF(data []byte) ([]byte, error) {
 		}
 
 		filtered = data
+
+		r := bytes.NewReader(filtered)
+		chunks := ReadPNGChunks(r)
+
+		for _, chunk := range chunks {
+			if !chunk.CRCIsValid() {
+				offset := int(chunk.Offset) + 8 + int(chunk.Length)
+				crc := chunk.CalculateCRC()
+				crcBytes := (*[4]byte)(unsafe.Pointer(&crc))[:]
+
+				copy(filtered[offset:len(crcBytes)+offset], crcBytes)
+
+				fmt.Println("Corrected CRC %v", chunk.CRCOffset())
+			}
+		}
 
 		_, err = png.Decode(bytes.NewReader(filtered))
 		if err != nil {
