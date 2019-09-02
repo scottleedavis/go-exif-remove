@@ -1,12 +1,12 @@
 package exifremove
 
 import (
-	"testing"
 	"io/ioutil"
+	"testing"
 
-	"github.com/stretchr/testify/assert"
 	jpegstructure "github.com/dsoprea/go-jpeg-image-structure"
 	pngstructure "github.com/dsoprea/go-png-image-structure"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestRemove(t *testing.T) {
@@ -20,7 +20,6 @@ func TestRemove(t *testing.T) {
 	_, _, err = sl.Exif()
 	assert.NotNil(t, err)
 
-
 	data, err = ioutil.ReadFile("exif-remove-tool/img/png/exif.png")
 	assert.Nil(t, err)
 	filtered, err = Remove(data)
@@ -29,6 +28,5 @@ func TestRemove(t *testing.T) {
 	cs, err := pmp.ParseBytes(filtered)
 	_, _, err = cs.Exif()
 	assert.NotNil(t, err)
-
 
 }

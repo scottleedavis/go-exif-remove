@@ -49,7 +49,7 @@ func (p pngChunk) CRCOffset() int64 {
 	return p.Offset + int64(8+p.Length)
 }
 
-func ReadPNGChunks(reader io.ReadSeeker) []pngChunk {
+func readPNGChunks(reader io.ReadSeeker) []pngChunk {
 	chunks := []pngChunk{}
 
 	reader.Seek(chunkStartOffset, os.SEEK_SET)

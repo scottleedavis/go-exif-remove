@@ -63,8 +63,8 @@ func handleFile(filepath string) ([]byte, error) {
 	} else {
 		_, _, err := image.Decode(bytes.NewReader(data))
 		if err != nil {
-				fmt.Printf("ERROR: original image is corrupt" + err.Error() + "\n")
-				return nil, err
+			fmt.Printf("ERROR: original image is corrupt" + err.Error() + "\n")
+			return nil, err
 		}
 		filtered, err := exifremove.Remove(data)
 		if err != nil {

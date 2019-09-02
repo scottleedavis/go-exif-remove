@@ -12,22 +12,23 @@ import (
 	"github.com/dsoprea/go-png-image-structure"
 )
 
-const (
-	JpegMediaType  = "jpeg"
-	PngMediaType   = "png"
-	OtherMediaType = "other"
-	StartBytes     = 0
-	EndBytes       = 0
-)
-
-type MediaContext struct {
-	MediaType string
-	RootIfd   *exif.Ifd
-	RawExif   []byte
-	Media     interface{}
-}
-
 func Remove(data []byte) ([]byte, error) {
+
+	const (
+		JpegMediaType  = "jpeg"
+		PngMediaType   = "png"
+		OtherMediaType = "other"
+		StartBytes     = 0
+		EndBytes       = 0
+	)
+
+	type MediaContext struct {
+		MediaType string
+		RootIfd   *exif.Ifd
+		RawExif   []byte
+		Media     interface{}
+	}
+
 	jmp := jpegstructure.NewJpegMediaParser()
 	pmp := pngstructure.NewPngMediaParser()
 	mc := &MediaContext{
@@ -107,7 +108,7 @@ func Remove(data []byte) ([]byte, error) {
 
 		filtered = data
 
-		chunks := ReadPNGChunks(bytes.NewReader(filtered))
+		chunks := readPNGChunks(bytes.NewReader(filtered))
 
 		for _, chunk := range chunks {
 			if !chunk.CRCIsValid() {
@@ -122,7 +123,7 @@ func Remove(data []byte) ([]byte, error) {
 			}
 		}
 
-		chunks = ReadPNGChunks(bytes.NewReader(filtered))
+		chunks = readPNGChunks(bytes.NewReader(filtered))
 		for _, chunk := range chunks {
 			if !chunk.CRCIsValid() {
 				return nil, errors.New("EXIF removal failed CRC ")
