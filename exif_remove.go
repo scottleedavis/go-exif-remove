@@ -135,10 +135,10 @@ func extractEXIF(data []byte) ([]byte, error) {
 						endExifBytes = i + len(mc.RawExif)
 					}
 				}
+				fill := make([]byte, len(data[startExifBytes:endExifBytes]))
+				copy(data[startExifBytes:endExifBytes], fill)
 			}
 
-			fill := make([]byte, len(data[startExifBytes:endExifBytes]))
-			copy(data[startExifBytes:endExifBytes], fill)
 			filtered = data
 
 			_, _, err = image.Decode(bytes.NewReader(filtered))
