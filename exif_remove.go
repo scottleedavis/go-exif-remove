@@ -49,7 +49,7 @@ func Remove(data []byte) ([]byte, error) {
 		mc.Media = sl
 
 		if rootIfd, rawExif, err := sl.Exif(); err != nil {
-			return nil, err
+			return data, nil
 		} else {
 			mc.RootIfd = rootIfd
 			mc.RawExif = rawExif
@@ -86,7 +86,7 @@ func Remove(data []byte) ([]byte, error) {
 		mc.Media = cs
 
 		if rootIfd, rawExif, err := cs.Exif(); err != nil {
-			return nil, err
+			return data, nil
 		} else {
 			mc.RootIfd = rootIfd
 			mc.RawExif = rawExif
@@ -126,7 +126,7 @@ func Remove(data []byte) ([]byte, error) {
 		chunks = readPNGChunks(bytes.NewReader(filtered))
 		for _, chunk := range chunks {
 			if !chunk.CRCIsValid() {
-				return nil, errors.New("EXIF removal failed CRC ")
+				return nil, errors.New("EXIF removal failed CRC")
 			}
 		}
 

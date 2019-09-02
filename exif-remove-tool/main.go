@@ -5,11 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"image"
-
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/scottleedavis/go-exif-remove"
 )
@@ -61,18 +59,15 @@ func handleFile(filepath string) ([]byte, error) {
 		fmt.Printf(err.Error())
 		return nil, err
 	} else {
-		_, _, err := image.Decode(bytes.NewReader(data))
-		if err != nil {
+		if _, _, err := image.Decode(bytes.NewReader(data)); err != nil {
 			fmt.Printf("ERROR: original image is corrupt" + err.Error() + "\n")
 			return nil, err
 		}
-		filtered, err := exifremove.Remove(data)
-		if err != nil {
-			if !strings.EqualFold(err.Error(), "no exif data") && !strings.EqualFold(err.Error(), "file does not have EXIF") {
-				fmt.Printf("* " + err.Error() + "\n")
-				return nil, errors.New(err.Error())
-			}
+		if filtered, err := exifremove.Remove(data); err != nil {
+			fmt.Printf("* " + err.Error() + "\n")
+			return nil, errors.New(err.Error())
+		} else {
+			return filtered, nil
 		}
-		return filtered, nil
 	}
 }
