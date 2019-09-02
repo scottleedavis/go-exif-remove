@@ -3,7 +3,6 @@ package exifremove
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"image/jpeg"
 	"image/png"
 
@@ -70,14 +69,14 @@ func RemoveEXIF(data []byte) ([]byte, error) {
 
 		filtered = data
 
-		_,  err = jpeg.Decode(bytes.NewReader(filtered))
+		_, err = jpeg.Decode(bytes.NewReader(filtered))
 		if err != nil {
 			return nil, errors.New("EXIF removal corrupted " + err.Error())
 		}
 
 	} else if pmp.LooksLikeFormat(data) {
-		mc.MediaType = PngMediaType
 
+		mc.MediaType = PngMediaType
 		cs, err := pmp.ParseBytes(data)
 		if err != nil {
 			return nil, err
@@ -85,7 +84,6 @@ func RemoveEXIF(data []byte) ([]byte, error) {
 		mc.Media = cs
 
 		if rootIfd, rawExif, err := cs.Exif(); err != nil {
-			fmt.Printf("boo\n")
 			return nil, err
 		} else {
 			mc.RootIfd = rootIfd
