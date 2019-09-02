@@ -1,5 +1,5 @@
 # go-exif-remove
-remove EXIF information from JPG and PNG files
+Removes EXIF information from JPG and PNG files
 
 Uses [go-exif](https://github.com/dsoprea/go-exif) to extract EXIF information and overwrites the EXIF region.
 
