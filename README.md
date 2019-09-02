@@ -11,4 +11,3 @@ noExifBytes, err := exifremove.Remove(imageBytes)
 
 See example usage in [exif-remote-tool](exif-remove-tool)
 
-_TODO png_
