@@ -3,7 +3,10 @@ package exifremove
 import (
 	"bytes"
 	"errors"
-	"image"
+	"fmt"
+	"image/jpeg"
+	"image/png"
+	"unsafe"
 
 	"github.com/dsoprea/go-exif"
 	"github.com/dsoprea/go-jpeg-image-structure"
@@ -37,6 +40,7 @@ func RemoveEXIF(data []byte) ([]byte, error) {
 	filtered := []byte{}
 
 	if jmp.LooksLikeFormat(data) {
+
 		mc.MediaType = JpegMediaType
 		sl, err := jmp.ParseBytes(data)
 		if err != nil {
@@ -51,35 +55,79 @@ func RemoveEXIF(data []byte) ([]byte, error) {
 			mc.RawExif = rawExif
 		}
 
-		if _, _, err := sl.FindExif(); err != nil {
-			return nil, err
-		} else {
+		startExifBytes := StartBytes
+		endExifBytes := EndBytes
 
-			startExifBytes := StartBytes
-			endExifBytes := EndBytes
-
-			if bytes.Contains(data, mc.RawExif) {
-				for i := 0; i < len(data)-len(mc.RawExif); i++ {
-					if bytes.Compare(data[i:i+len(mc.RawExif)], mc.RawExif) == 0 {
-						startExifBytes = i
-						endExifBytes = i + len(mc.RawExif)
-					}
+		if bytes.Contains(data, mc.RawExif) {
+			for i := 0; i < len(data)-len(mc.RawExif); i++ {
+				if bytes.Compare(data[i:i+len(mc.RawExif)], mc.RawExif) == 0 {
+					startExifBytes = i
+					endExifBytes = i + len(mc.RawExif)
 				}
-				fill := make([]byte, len(data[startExifBytes:endExifBytes]))
-				copy(data[startExifBytes:endExifBytes], fill)
 			}
+			fill := make([]byte, len(data[startExifBytes:endExifBytes]))
+			copy(data[startExifBytes:endExifBytes], fill)
+		}
 
-			filtered = data
+		filtered = data
 
-			_, _, err = image.Decode(bytes.NewReader(filtered))
-			if err != nil {
-				return nil, errors.New("EXIF removal corrupted " + err.Error())
-			}
-
+		_, err = jpeg.Decode(bytes.NewReader(filtered))
+		if err != nil {
+			return nil, errors.New("EXIF removal corrupted " + err.Error())
 		}
 
 	} else if pmp.LooksLikeFormat(data) {
+
 		mc.MediaType = PngMediaType
+		cs, err := pmp.ParseBytes(data)
+		if err != nil {
+			return nil, err
+		}
+		mc.Media = cs
+
+		if rootIfd, rawExif, err := cs.Exif(); err != nil {
+			return nil, err
+		} else {
+			mc.RootIfd = rootIfd
+			mc.RawExif = rawExif
+		}
+
+		startExifBytes := StartBytes
+		endExifBytes := EndBytes
+
+		if bytes.Contains(data, mc.RawExif) {
+			for i := 0; i < len(data)-len(mc.RawExif); i++ {
+				if bytes.Compare(data[i:i+len(mc.RawExif)], mc.RawExif) == 0 {
+					startExifBytes = i
+					endExifBytes = i + len(mc.RawExif)
+				}
+			}
+			fill := make([]byte, len(data[startExifBytes:endExifBytes]))
+			copy(data[startExifBytes:endExifBytes], fill)
+		}
+
+		filtered = data
+
+		r := bytes.NewReader(filtered)
+		chunks := ReadPNGChunks(r)
+
+		for _, chunk := range chunks {
+			if !chunk.CRCIsValid() {
+				offset := int(chunk.Offset) + 8 + int(chunk.Length)
+				crc := chunk.CalculateCRC()
+				crcBytes := (*[4]byte)(unsafe.Pointer(&crc))[:]
+
+				copy(filtered[offset:len(crcBytes)+offset], crcBytes)
+
+				fmt.Println("Corrected CRC %v", chunk.CRCOffset())
+			}
+		}
+
+		_, err = png.Decode(bytes.NewReader(filtered))
+		if err != nil {
+			return nil, errors.New("EXIF removal corrupted " + err.Error())
+		}
+
 	}
 
 	return filtered, nil
