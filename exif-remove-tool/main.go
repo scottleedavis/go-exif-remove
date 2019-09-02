@@ -20,7 +20,7 @@ func main() {
 		var files []string
 		root := "img"
 		err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-			if path != "img" {
+			if path != "img" && path != "img/png" && path != "img/jpg" {
 				files = append(files, path)
 			}
 			return nil
