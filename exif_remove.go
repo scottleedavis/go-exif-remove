@@ -10,7 +10,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"encoding/hex"
 
 	"github.com/dsoprea/go-exif"
 	"github.com/dsoprea/go-jpeg-image-structure"
@@ -21,9 +20,9 @@ const (
 	JpegMediaType  = "jpeg"
 	PngMediaType   = "png"
 	OtherMediaType = "other"
-	StartBytes    = 4
-	EndBytes      = 4
-	OffsetBytes   = 4
+	StartBytes     = 4
+	EndBytes       = 4
+	OffsetBytes    = 4
 )
 
 type MediaContext struct {
@@ -51,26 +50,26 @@ func main() {
 		fail := 0
 		for _, file := range files {
 			fmt.Println(file)
-			if _, err := handleFile(file); err != nil {
+			if b, err := handleFile(file); err != nil {
 				fail += 1
-				//fmt.Printf(err.Error())
 			} else {
 				pass += 1
+				f := filepath.Base(file)
+				ioutil.WriteFile("img_output/"+f, b, 0644)
 			}
 			fmt.Println()
 		}
 
-		math := 100 * pass / (pass+fail)
-		fmt.Printf("Results (%v%%): %v pass, %v fail \n", int(math), pass, fail)
+		percentage := 100 * pass / (pass + fail)
+		fmt.Printf("Results (%v%%): %v pass, %v fail \n", int(percentage), pass, fail)
 	} else {
-		filepath := os.Args[1]
-		b, _ := ioutil.ReadFile(filepath)
-		os.Remove("dht.txt")
-		f, _ := os.Create("dht.txt")
-		output := hex.Dump(b)
-		f.WriteString(output)
-		f.Close()
-		//handleFile(filepath)
+		path := os.Args[1]
+		if b, err := handleFile(path); err != nil {
+			fmt.Printf(err.Error())
+		} else {
+			file := filepath.Base(path)
+			ioutil.WriteFile("img_output/"+file, b, 0644)
+		}
 	}
 
 }
@@ -122,47 +121,25 @@ func extractEXIF(data []byte) ([]byte, error) {
 			mc.RawExif = rawExif
 		}
 
-		if _, sExif, err := sl.FindExif(); err != nil {
+		if _, _, err := sl.FindExif(); err != nil {
 			return nil, err
 		} else {
-			//fmt.Printf("* (sExif) %x %s %x\n", sExif.Offset, sExif.MarkerName, len(sExif.Data))
 
-
-			bytesCount := 0
 			startExifBytes := StartBytes
 			endExifBytes := EndBytes
-			for _, s := range sl.Segments() {
 
-				if s.MarkerName == sExif.MarkerName {
-					if startExifBytes == StartBytes {
-						startExifBytes = bytesCount
-						endExifBytes = startExifBytes + len(s.Data) + OffsetBytes
-					} else {
-						endExifBytes += len(s.Data) + OffsetBytes
+			if bytes.Contains(data, mc.RawExif) {
+				for i := 0; i < len(data)-len(mc.RawExif); i++ {
+					if bytes.Compare(data[i:i+len(mc.RawExif)], mc.RawExif) == 0 {
+						startExifBytes = i
+						endExifBytes = i + len(mc.RawExif)
 					}
-					fmt.Printf("* (sExif) %x %s %v (%x)\n", s.Offset, s.MarkerName, len(s.Data), s.Offset+len(s.Data))
-				} else {
-					fmt.Printf("* (s) %x %s %v (%x)\n", s.Offset, s.MarkerName, len(s.Data), s.Offset+len(s.Data))
 				}
-
-				//if s.MarkerName == "DHT" {
-				//	fmt.Printf("%v %v %v\n",bytesCount,len(s.Data), len(data))
-				//	output := hex.Dump(data[bytesCount:bytesCount + len(s.Data) + OFFSET_BYTES])
-				//	os.Remove("dht.txt")
-				//	f, _ := os.Create("dht.txt")
-				//	f.WriteString(output)
-				//	f.Close()
-				//}
-
-				bytesCount += len(s.Data) + OffsetBytes
-
 			}
 
-			//filtered = data
-			filtered = data[:startExifBytes]
-			filtered = append(filtered, data[endExifBytes:]...)
-
-			fmt.Printf("* (size) %v %v  (%v)\n", len(data), len(filtered), len(data)-len(filtered))
+			fill := make([]byte, len(data[startExifBytes:endExifBytes]))
+			copy(data[startExifBytes:endExifBytes], fill)
+			filtered = data
 
 			_, _, err = image.Decode(bytes.NewReader(filtered))
 			if err != nil {
