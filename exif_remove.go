@@ -28,7 +28,7 @@ type MediaContext struct {
 	Media     interface{}
 }
 
-func RemoveEXIF(data []byte) ([]byte, error) {
+func Remove(data []byte) ([]byte, error) {
 	jmp := jpegstructure.NewJpegMediaParser()
 	pmp := pngstructure.NewPngMediaParser()
 	mc := &MediaContext{

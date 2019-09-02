@@ -6,7 +6,7 @@ Uses [go-exif](https://github.com/dsoprea/go-exif) to extract EXIF information a
 ```go
 import 	"github.com/scottleedavis/go-exif-remove"
 
-noExifBytes, err := exifremove.RemoveEXIF(imageBytes)
+noExifBytes, err := exifremove.Remove(imageBytes)
 ```
 
 _TODO png_

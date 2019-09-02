@@ -65,7 +65,7 @@ func handleFile(filepath string) ([]byte, error) {
 		//	fmt.Printf("ERROR: original image is corrupt" + err.Error() + "\n")
 		//	return nil, err
 		//}
-		filtered, err := exifremove.RemoveEXIF(data)
+		filtered, err := exifremove.Remove(data)
 		if err != nil {
 			if !strings.EqualFold(err.Error(), "no exif data") && !strings.EqualFold(err.Error(), "file does not have EXIF") {
 				fmt.Printf("* " + err.Error() + "\n")
