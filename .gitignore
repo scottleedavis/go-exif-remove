@@ -13,4 +13,4 @@
 
 *.iml
 .idea
-img_output
+exif-remove-tool/img_output
