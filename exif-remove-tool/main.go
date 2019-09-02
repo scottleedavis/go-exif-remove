@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"../../go-exif-remove"
+	"github.com/scottleedavis/go-exif-remove"
 )
 
 func main() {
