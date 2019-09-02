@@ -61,12 +61,6 @@ func handleFile(filepath string) ([]byte, error) {
 		fmt.Printf(err.Error())
 		return nil, err
 	} else {
-		//_, err = jpeg.Decode(bytes.NewReader(data))
-		//_, err = png.Decode(bytes.NewReader(data))
-		//if err != nil  {
-		//	fmt.Printf("ERROR: original image is corrupt" + err.Error() + "\n")
-		//	return nil, err
-		//}
 		_, _, err := image.Decode(bytes.NewReader(data))
 		if err != nil {
 				fmt.Printf("ERROR: original image is corrupt" + err.Error() + "\n")
