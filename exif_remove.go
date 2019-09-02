@@ -20,9 +20,8 @@ const (
 	JpegMediaType  = "jpeg"
 	PngMediaType   = "png"
 	OtherMediaType = "other"
-	StartBytes     = 4
-	EndBytes       = 4
-	OffsetBytes    = 4
+	StartBytes     = 0
+	EndBytes       = 0
 )
 
 type MediaContext struct {
