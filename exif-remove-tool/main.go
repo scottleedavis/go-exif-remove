@@ -67,7 +67,7 @@ func handleFile(filepath string) ([]byte, error) {
 		//}
 		filtered, err := exifremove.RemoveEXIF(data)
 		if err != nil {
-			if !strings.EqualFold(err.Error(), "no exif data") {
+			if !strings.EqualFold(err.Error(), "no exif data") && !strings.EqualFold(err.Error(), "file does not have EXIF") {
 				fmt.Printf("* " + err.Error() + "\n")
 				return nil, errors.New(err.Error())
 			}
