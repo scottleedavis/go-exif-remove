@@ -9,5 +9,5 @@ import 	"github.com/scottleedavis/go-exif-remove"
 noExifBytes, err := exifremove.Remove(imageBytes)
 ```
 
-See example usage in [exif-remote-tool](exif-remove-tool)
+See example usage in [exif-remove-tool](exif-remove-tool)
 
