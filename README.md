@@ -1,5 +1,5 @@
 # go-exif-remove
-[![Build Status](https://img.shields.io/circleci/project/github/scottleedavis/go-exif-remove/master.svg)](https://circleci.com/gh/scottleedavis/go-exif-remove)
+[![Build Status](https://img.shields.io/circleci/project/github/scottleedavis/go-exif-remove/master.svg)](https://circleci.com/gh/scottleedavis/go-exif-remove) [![codecov](https://codecov.io/gh/scottleedavis/go-exif-remove/branch/master/graph/badge.svg)](https://codecov.io/gh/scottleedavis/go-exif-remove)
 
 Removes EXIF information from JPG and PNG files
 
