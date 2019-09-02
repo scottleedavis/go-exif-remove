@@ -4,16 +4,12 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"image"
 	"image/jpeg"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/dsoprea/go-exif"
-	"github.com/dsoprea/go-jpeg-image-structure"
-	"github.com/dsoprea/go-png-image-structure"
 	"github.com/scottleedavis/go-exif-remove"
 )
 
@@ -69,7 +65,7 @@ func handleFile(filepath string) ([]byte, error) {
 			fmt.Printf("ERROR: original image is corrupt" + err.Error() + "\n")
 			return nil, err
 		}
-		filtered, err := extractEXIF(data)
+		filtered, err := exifremove.RemoveEXIF(data)
 		if err != nil {
 			if !strings.EqualFold(err.Error(), "no exif data") {
 				fmt.Printf("* " + err.Error() + "\n")
