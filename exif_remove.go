@@ -63,6 +63,7 @@ func Remove(data []byte) ([]byte, error) {
 				if bytes.Compare(data[i:i+len(mc.RawExif)], mc.RawExif) == 0 {
 					startExifBytes = i
 					endExifBytes = i + len(mc.RawExif)
+					break
 				}
 			}
 			fill := make([]byte, len(data[startExifBytes:endExifBytes]))
@@ -100,6 +101,7 @@ func Remove(data []byte) ([]byte, error) {
 				if bytes.Compare(data[i:i+len(mc.RawExif)], mc.RawExif) == 0 {
 					startExifBytes = i
 					endExifBytes = i + len(mc.RawExif)
+					break
 				}
 			}
 			fill := make([]byte, len(data[startExifBytes:endExifBytes]))
