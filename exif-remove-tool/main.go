@@ -67,6 +67,10 @@ func handleFile(filepath string) ([]byte, error) {
 			fmt.Printf("* " + err.Error() + "\n")
 			return nil, errors.New(err.Error())
 		} else {
+			if _, _, err = image.Decode(bytes.NewReader(filtered)); err != nil {
+				fmt.Printf("ERROR: filtered image is corrupt" + err.Error() + "\n")
+				return nil, err
+			}
 			return filtered, nil
 		}
 	}
