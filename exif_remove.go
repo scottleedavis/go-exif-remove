@@ -31,38 +31,28 @@ func Remove(data []byte) ([]byte, error) {
 
 	jmp := jpegstructure.NewJpegMediaParser()
 	pmp := pngstructure.NewPngMediaParser()
-	mc := &MediaContext{
-		MediaType: OtherMediaType,
-		RootIfd:   nil,
-		RawExif:   nil,
-		Media:     nil,
-	}
 	filtered := []byte{}
 
 	if jmp.LooksLikeFormat(data) {
 
-		mc.MediaType = JpegMediaType
 		sl, err := jmp.ParseBytes(data)
 		if err != nil {
 			return nil, err
 		}
-		mc.Media = sl
 
-		if rootIfd, rawExif, err := sl.Exif(); err != nil {
+		_, rawExif, err := sl.Exif()
+		if err != nil {
 			return data, nil
-		} else {
-			mc.RootIfd = rootIfd
-			mc.RawExif = rawExif
 		}
 
 		startExifBytes := StartBytes
 		endExifBytes := EndBytes
 
-		if bytes.Contains(data, mc.RawExif) {
-			for i := 0; i < len(data)-len(mc.RawExif); i++ {
-				if bytes.Compare(data[i:i+len(mc.RawExif)], mc.RawExif) == 0 {
+		if bytes.Contains(data, rawExif) {
+			for i := 0; i < len(data)-len(rawExif); i++ {
+				if bytes.Compare(data[i:i+len(rawExif)], rawExif) == 0 {
 					startExifBytes = i
-					endExifBytes = i + len(mc.RawExif)
+					endExifBytes = i + len(rawExif)
 					break
 				}
 			}
@@ -79,28 +69,24 @@ func Remove(data []byte) ([]byte, error) {
 
 	} else if pmp.LooksLikeFormat(data) {
 
-		mc.MediaType = PngMediaType
 		cs, err := pmp.ParseBytes(data)
 		if err != nil {
 			return nil, err
 		}
-		mc.Media = cs
 
-		if rootIfd, rawExif, err := cs.Exif(); err != nil {
+		_, rawExif, err := cs.Exif()
+		if err != nil {
 			return data, nil
-		} else {
-			mc.RootIfd = rootIfd
-			mc.RawExif = rawExif
 		}
 
 		startExifBytes := StartBytes
 		endExifBytes := EndBytes
 
-		if bytes.Contains(data, mc.RawExif) {
-			for i := 0; i < len(data)-len(mc.RawExif); i++ {
-				if bytes.Compare(data[i:i+len(mc.RawExif)], mc.RawExif) == 0 {
+		if bytes.Contains(data, rawExif) {
+			for i := 0; i < len(data)-len(rawExif); i++ {
+				if bytes.Compare(data[i:i+len(rawExif)], rawExif) == 0 {
 					startExifBytes = i
-					endExifBytes = i + len(mc.RawExif)
+					endExifBytes = i + len(rawExif)
 					break
 				}
 			}
