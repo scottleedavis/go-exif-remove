@@ -8,8 +8,8 @@ import (
 	"image/png"
 
 	"github.com/dsoprea/go-exif"
-	"github.com/dsoprea/go-jpeg-image-structure"
-	"github.com/dsoprea/go-png-image-structure"
+	jpegstructure "github.com/dsoprea/go-jpeg-image-structure"
+	pngstructure "github.com/dsoprea/go-png-image-structure"
 )
 
 func Remove(data []byte) ([]byte, error) {

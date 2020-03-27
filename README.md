@@ -12,5 +12,16 @@ import 	"github.com/scottleedavis/go-exif-remove"
 noExifBytes, err := exifremove.Remove(imageBytes)
 ```
 
-See example usage in [exif-remove-tool](exif-remove-tool)
+# installation
+## install to PATH
+go install github.com/aakarim/go-exif-remove
 
+# example usage
+
+```bash
+#run against all in img folder
+remove-exif
+
+#run against single file
+remove-exif img/jpg/11-tests.jpg
+```
