@@ -1,4 +1,4 @@
-module github.com/aakarim/go-exif-remove/exif_remove
+module github.com/aakarim/remove-exif/exif_remove
 
 go 1.14
 

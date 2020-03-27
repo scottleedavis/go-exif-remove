@@ -9,7 +9,7 @@ import (
 	"os"
 	"path/filepath"
 
-	exifremove "github.com/aakarim/go-exif-remove/exif_remove"
+	exifremove "github.com/aakarim/remove-exif/exif_remove"
 )
 
 func main() {
