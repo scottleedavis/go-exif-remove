@@ -13,7 +13,11 @@ import (
 )
 
 func main() {
-
+	// create output folder in current directory if none
+	outputPath := filepath.Join(".", "img_output")
+	if _, err := os.Stat(outputPath); os.IsNotExist(err) {
+		os.Mkdir(outputPath, os.ModePerm)
+	}
 	if len(os.Args) == 1 {
 		var files []string
 		root := "img"
@@ -35,7 +39,7 @@ func main() {
 			} else {
 				pass += 1
 				f := filepath.Base(file)
-				ioutil.WriteFile("img_output/"+f, b, 0644)
+				ioutil.WriteFile(filepath.Join(outputPath, f), b, 0644)
 			}
 			fmt.Println()
 		}
@@ -48,7 +52,8 @@ func main() {
 			fmt.Printf(err.Error())
 		} else {
 			file := filepath.Base(path)
-			ioutil.WriteFile("img_output/"+file, b, 0644)
+			ioutil.WriteFile(filepath.Join(outputPath, file), b, 0644)
+			fmt.Println("Removed EXIF data successfully")
 		}
 	}
 
