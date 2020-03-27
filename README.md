@@ -1,22 +1,17 @@
-# go-exif-remove
-[![Build Status](https://img.shields.io/circleci/project/github/scottleedavis/go-exif-remove/master.svg)](https://circleci.com/gh/scottleedavis/go-exif-remove) [![codecov](https://codecov.io/gh/scottleedavis/go-exif-remove/branch/master/graph/badge.svg)](https://codecov.io/gh/scottleedavis/go-exif-remove)  [![GoDoc](https://godoc.org/github.com/scottleedavis/go-exif-remove?status.svg)](https://godoc.org/github.com/scottleedavis/go-exif-remove)
+# Remove EXIF
+![Go](https://github.com/aakarim/remove-exif/workflows/Go/badge.svg)
+[![GoDoc](https://godoc.org/github.com/aakarim/remove-exif/exif_remove?status.svg)](https://godoc.org/github.com/aakarim/remove-exif/exif_remove)
 
 
 Removes EXIF information from JPG and PNG files
 
 Uses [go-exif](https://github.com/dsoprea/go-exif) to extract EXIF information and overwrites the EXIF region.
 
-```go
-import 	"github.com/scottleedavis/go-exif-remove"
+# Tool
+## Installation into $PATH
+`go install github.com/aakarim/remove-exif`
 
-noExifBytes, err := exifremove.Remove(imageBytes)
-```
-
-# installation
-## install to PATH
-go install github.com/aakarim/go-exif-remove
-
-# example usage
+# Example Usage
 
 ```bash
 #run against all in img folder
@@ -24,4 +19,14 @@ remove-exif
 
 #run against single file
 remove-exif img/jpg/11-tests.jpg
+```
+
+# Library
+## Installation
+`go get -u github.com/aakarim/remove-exif/exif_remove`
+## Example Usage
+```go
+import 	"github.com/aakarim/remove-exif/exif_remove"
+
+noExifBytes, err := exifremove.Remove(imageBytes)
 ```
